@@ -2,10 +2,10 @@ import random
 from time import sleep
 
 
-def human_pause() -> None:
+def human_pause(a: int|float = 0, b: int|float = 1) -> None:
     """
-    Human pause 1 .. 11 seconds.
+    Human pause random seconds in a .. b seconds. Default: a = 0, b = 1.
     """
-    seconds = random.random() * 12
+    seconds = random.uniform(a, b) 
     print(f'waiting {seconds}...')
     sleep(seconds)

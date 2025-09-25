@@ -1,111 +1,53 @@
 from applib.custom_chrome_options import CustomChromeOptions
 from selenium import webdriver
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
+from applib.human_pause import human_pause
+from applib.cdp_scripts import script1, script2
 
 
 
 class Browser:
     def __init__(self) -> None:
-        self._driver = webdriver.Chrome(options=CustomChromeOptions().setup())
-        # --- Реалистичный JS, который выполняется до кода страницы ---
-        script = r"""
-        (() => {
-        // Подмена navigator.webdriver
-        try {
-            Object.defineProperty(navigator, 'webdriver', { get: () => false, configurable: true });
-        } catch (e) {}
-
-        // Подмена navigator.languages
-        try {
-            Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], configurable: true });
-        } catch (e) {}
-
-        // Реалистичные "плагины"
-        try {
-            const fakePlugins = [
-            {
-                name: 'Chrome PDF Plugin',
-                filename: 'internal-pdf-viewer',
-                description: 'Portable Document Format'
-            },
-            {
-                name: 'Widevine Content Decryption Module',
-                filename: 'widevinecdm',
-                description: ''
-            }
-            ];
-
-            // Сделаем объект похожим на PluginArray
-            const pluginArray = {
-            length: fakePlugins.length,
-            item: function(i) { return fakePlugins[i]; },
-            namedItem: function(name) { return fakePlugins.find(p => p.name === name) || null; }
-            };
-
-            // добавим числовые индексы (0,1,...)
-            for (let i = 0; i < fakePlugins.length; i++) {
-            pluginArray[i] = fakePlugins[i];
-            }
-
-            // toString / Symbol.toStringTag чтобы выглядеть естественнее
-            Object.defineProperty(pluginArray, Symbol.toStringTag, { value: 'PluginArray' });
-
-            Object.defineProperty(navigator, 'plugins', {
-            get: () => pluginArray,
-            configurable: true
-            });
-        } catch (e) {}
-
-        // Доп. — иногда проверяют permissions API (пример: разрешения для notifications)
-        try {
-            const origQuery = window.navigator.permissions && window.navigator.permissions.query;
-            if (origQuery) {
-            const fakeQuery = function(parameters) {
-                if (parameters && parameters.name === 'notifications') {
-                return Promise.resolve({ state: Notification.permission });
-                }
-                return origQuery(parameters);
-            };
-            // Переопределяем метод
-            Object.defineProperty(window.navigator, 'permissions', {
-                get: () => ({ query: fakeQuery }),
-                configurable: true
-            });
-            }
-        } catch (e) {}
-
-        })();
         """
-
-        # Добавляем скрипт, который будет выполняться на каждом новом документе
-        resp = self._driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": script})
-        # в ответе обычно есть 'identifier' или 'scriptId' — сохраним как script_id
-        script_id = resp.get("identifier") or resp.get("scriptId")
-        print("added script id:", script_id)
-
+        Initialize ChromeBrowser with custom options.
+        """
+        chrome_options = CustomChromeOptions().setup()
+        self._driver = webdriver.Chrome(options=chrome_options)
+        
+        # Perform running scripts on every page before loading.
+        self._driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": script1})        
+        self._driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {"source": script2})
        
+
 
     def open(self, url: str) -> None:
         """
         Open url.
         """
         self._driver.get(url=url)
-
-        # # можно проверить из браузера:
-        # print(self._driver.execute_script("return navigator.webdriver;"))       # ожидаем False
-        # print(self._driver.execute_script("return navigator.languages;"))      # ожидаем ['en-US','en']
-        # print(self._driver.execute_script("return navigator.plugins.length;")) # ожидаем >0
+        
+        # wait until loads body.
+        WebDriverWait(self._driver, 10).until(
+            EC.presence_of_element_located((By.TAG_NAME, 'body'))
+        )
+        human_pause(4, 5)
 
 
 
     @property
-    def driver(self):
+    def driver(self) -> WebDriver:
+        """
+        Return instance of WebDriver.
+        """
         return self._driver
 
 
+
     def close(self) -> None:
+        """
+        Terminate driver.
+        """
         self._driver.quit()
-
-
-# https://www.instagram.com/aasdjjfjfkfk/
-# https://www.instagram.com/geek_culture_store/
-# https://www.instagram.com/hildegard.debondt/

@@ -2,3 +2,7 @@
 logs
 __pycache__
 .env
+*.xlsx
+video/*.png
+video/
+*.png
