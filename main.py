@@ -2,7 +2,7 @@ from applib.extract_and_save import ExtractAndSave
 
 
 def main():
-    urls = ['https://instagram.com/pashabratanov',]
+    urls = ['https://instagram.com/pashabratanov', 'https://instagram.com/pashabratanov', ]
     ExtractAndSave(urls=urls).perform()
 
 

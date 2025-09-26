@@ -24,7 +24,7 @@ class MediaData:
         data = {
             'id': self._id, 
             'url': self._image_link.get_attribute("href"), 
-            'comments': '', 
+            'comments': 'N/A', 
             'subs': '',
         }
 
@@ -44,7 +44,8 @@ class MediaData:
         if not comments_block_element:
             return data
         
-        data['comments'] = comments_block_element[2].text
+        if len(comments_block_element) > 2:
+            data['comments'] = comments_block_element[2].text
         
         close_image_element = self._close_image_element()
 

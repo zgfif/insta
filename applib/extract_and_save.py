@@ -22,15 +22,25 @@ class ExtractAndSave:
         """
         load_dotenv()
 
-        for url in self._urls:
-            self._browser.open(url=url)
-            
-            Login(driver=self._browser.driver, 
-                  username=os.getenv('IUSERNAME', ''), 
-                  password=os.getenv('IPASSWORD', '')
-            ).perform()
+        if not self._urls:
+            print('the urls list is empty.')
+            return
+    
+        # processing the first url
+        self._browser.open(url=self._urls[0])
+        
+        Login(driver=self._browser.driver, 
+                username=os.getenv('IUSERNAME', ''), 
+                password=os.getenv('IPASSWORD', '')
+        ).perform()
 
-            SaveLoginInfo(driver=self._browser.driver).process()
+        SaveLoginInfo(driver=self._browser.driver).process()
+
+        Profile(driver=self._browser.driver, filename=self._filename(url=self._urls[0])).process()
+
+        # process other urls
+        for url in self._urls[1:]:
+            self._browser.open(url=url)
 
             Profile(driver=self._browser.driver, filename=self._filename(url=url)).process()
         
