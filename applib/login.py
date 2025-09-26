@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
-from time import sleep
 from applib.human_like_mouse_move import human_like_mouse_move
 from applib.human_pause import human_pause
 
@@ -21,7 +20,7 @@ class Login:
 
     def perform(self) -> None:
         """
-        
+        Enter username, password and press "Log in".
         """
         input_username_element = self._input_username_element()
         if not input_username_element:
@@ -35,6 +34,7 @@ class Login:
         if not login_button_element:
             return
         
+        print('Start log in...')
         human_like_mouse_move(driver=self._driver, element=input_username_element)
         input_username_element.send_keys(self._username)
         human_pause(2, 5)
@@ -48,20 +48,17 @@ class Login:
         human_pause(7, 15)
 
 
-
     def _input_username_element(self) -> WebElement|None:
         """
         Return input username element. If could not found return None.
         """
         selector = (By.XPATH, "//input[@name='username']")
-
         try:
             return WebDriverWait(self._driver, self.TIMEOUT).until(
                 EC.visibility_of_element_located(selector)
             )
         except TimeoutException:
             print('Could not found username input. Return None.')
-
 
 
     def _input_password_element(self) -> WebElement|None:
@@ -75,7 +72,6 @@ class Login:
             )
         except TimeoutException:
             print('Could not found password input. Return None.')
-
 
 
     def _login_button_element(self) -> WebElement|None:

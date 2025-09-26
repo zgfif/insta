@@ -4,7 +4,6 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
-from time import sleep
 from applib.human_like_mouse_move import human_like_mouse_move
 from applib.human_pause import human_pause
 
@@ -24,20 +23,24 @@ class SaveLoginInfo:
         Process "Save login info" window.
         """
         human_pause(4, 6)
+
         save_info_element = self._save_info_element()
+        if not save_info_element:
+            return
         
         not_now_element = self._not_now_element()
+        if not not_now_element:
+            return
 
-        if save_info_element and not_now_element:
-            # print('save_info_element ', save_info_element) 
-            # print('not_now_element ', not_now_element)
+        print('Start Save login info...')
 
-            if self._save:
-                human_like_mouse_move(driver=self._driver, element=save_info_element)
-                save_info_element.click()
-            else:
-                human_like_mouse_move(driver=self._driver, element=not_now_element)
-                not_now_element.click()
+        if self._save:
+            human_like_mouse_move(driver=self._driver, element=save_info_element)
+            save_info_element.click()
+        else:
+            human_like_mouse_move(driver=self._driver, element=not_now_element)
+            not_now_element.click()
+
         human_pause(2, 3)
 
 

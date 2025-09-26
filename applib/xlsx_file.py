@@ -21,12 +21,16 @@ class XlsxFile:
         
         sheet = workbook.active
 
+        if not sheet:
+            print('No active sheet to add row')
+            return
+
         sheet.append(list(data.values()))
         
         workbook.save(self._filepath)
 
 
-    def rows(self) -> tuple[tuple]:
+    def rows(self) -> tuple:
         """
         Return rows from xlsx file.
         """
@@ -34,10 +38,17 @@ class XlsxFile:
 
         # Select the active sheet
         sheet = wb.active
+        
+        if not sheet:
+            print('no active sheet. Return an empty tuple.')
+            return tuple()
+        
         rows = []
+
         # Read and print the data
         for row in sheet.iter_rows(min_row=1, max_row=sheet.max_row, values_only=True):
             rows.append(row)
+    
         return tuple(rows)
 
 
@@ -49,5 +60,8 @@ class XlsxFile:
         if not Path.exists(file_path):
             wb = Workbook()
             sheet = wb.active
+            if not sheet:
+                print('Could not found active sheet.')
+                return
             sheet.append(self.COLUMNS)
             wb.save(self._filepath)

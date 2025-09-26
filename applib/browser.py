@@ -9,6 +9,7 @@ from applib.cdp_scripts import script1, script2
 
 
 
+
 class Browser:
     def __init__(self) -> None:
         """
@@ -27,6 +28,7 @@ class Browser:
         """
         Open url.
         """
+        print(f'Opening page {url} ...')
         self._driver.get(url=url)
         
         # wait until loads body.
@@ -50,4 +52,5 @@ class Browser:
         """
         Terminate driver.
         """
+        print('Closing browser...')
         self._driver.quit()

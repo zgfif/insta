@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
-from applib.media_data import ImageData
+from applib.media_data import MediaData
 from applib.xlsx_file import XlsxFile
 
 
@@ -33,8 +33,10 @@ class Profile:
         if not images_links:
             return
 
-        for i, link in enumerate(images_links[0:1]):
-            data = ImageData(driver=self._driver, image_link=link, id=i+1).extract()
+        print(f'Start collecting data for {self._filename} ...')
+
+        for i, link in enumerate(images_links):
+            data = MediaData(driver=self._driver, image_link=link, id=i+1).extract()
             print(f'media: {i}',data)
 
             XlsxFile(filepath=self._filename).add_row(data)
