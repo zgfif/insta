@@ -6,12 +6,9 @@ import time
 
 class TestBrowser(unittest.TestCase):
     def test_open_instagram(self):
-        browser = Browser()
+        with Browser() as browser:
+            browser.open(url='https://www.instagram.com/hildegard.debondt/')
         
-        browser.open(url='https://www.instagram.com/hildegard.debondt/')
+            time.sleep(5)
         
-        time.sleep(5)
-        
-        self.assertIn('hildegard.debondt', browser.driver.current_url)
-        
-        browser.close()
+            self.assertIn('hildegard.debondt', browser.driver.current_url)
