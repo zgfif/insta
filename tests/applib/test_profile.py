@@ -12,16 +12,17 @@ class TestProfile(unittest.TestCase):
     def test_profile(self):
         url = 'https://instagram.com/pashabratanov'
 
-        b = Browser()
-        
-        load_dotenv()
-        
-        b.open(url=url)
+        with Browser() as b:            
+            load_dotenv()
+            
+            b.open(url=url)
 
-        Login(driver=b.driver, username=os.getenv('IUSERNAME', ''), password=os.getenv('IPASSWORD', '')).perform()
+            username = os.getenv('IUSERNAME', '')
 
-        SaveLoginInfo(driver=b.driver).process()
-        
-        Profile(driver=b.driver, filename=f'{url}.xlsx').process()
+            password = os.getenv('IPASSWORD', '')
 
-        b.close()
+            Login(driver=b.driver, logger=b.logger, username=username, password=password).perform()
+
+            SaveLoginInfo(driver=b.driver, logger=b.logger).process()
+            
+            Profile(driver=b.driver, logger=b.logger, filename=f'{url}.xlsx').process()

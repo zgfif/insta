@@ -1,14 +1,15 @@
 from openpyxl import Workbook
 import openpyxl
 from pathlib import Path
-
+from logging import Logger
 
 
 class XlsxFile:
     COLUMNS = ('id', 'url', 'comments', 'subs',)
 
-    def __init__(self, filepath: str) -> None:
+    def __init__(self, logger: Logger, filepath: str) -> None:
         self._filepath = filepath
+        self._logger = logger
         self._prepare_file()
 
     
@@ -22,7 +23,7 @@ class XlsxFile:
         sheet = workbook.active
 
         if not sheet:
-            print('No active sheet to add row')
+            self._logger.warning('No active sheet to add row')
             return
 
         sheet.append(list(data.values()))
@@ -40,7 +41,7 @@ class XlsxFile:
         sheet = wb.active
         
         if not sheet:
-            print('no active sheet. Return an empty tuple.')
+            self._logger.warning('no active sheet. Return an empty tuple.')
             return tuple()
         
         rows = []
@@ -61,7 +62,7 @@ class XlsxFile:
             wb = Workbook()
             sheet = wb.active
             if not sheet:
-                print('Could not found active sheet.')
+                self._logger.warning('Could not found active sheet.')
                 return
             sheet.append(self.COLUMNS)
             wb.save(self._filepath)

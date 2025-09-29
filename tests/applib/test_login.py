@@ -21,7 +21,8 @@ class TestLogin(unittest.TestCase):
         username = os.getenv('IUSERNAME', '')
         password = os.getenv('IPASSWORD', '')
 
-        login = Login(driver=browser.driver, 
+        login = Login(driver=browser.driver,
+                      logger=browser.logger,
                       username=username, 
                       password=password,
                       )

@@ -7,7 +7,8 @@ from selenium.webdriver.common.by import By
 from applib.human_pause import human_pause
 from applib.cdp_scripts import script1, script2
 from selenium.common.exceptions import TimeoutException, WebDriverException
-
+from applib.custom_logger import CustomLogger
+import logging
 
 
 
@@ -18,6 +19,7 @@ class Browser:
         """
         chrome_options = CustomChromeOptions().setup()
         self._driver = webdriver.Chrome(options=chrome_options)
+        self._logger = CustomLogger().setup()
         
         # Perform running scripts on every page before loading.
         for script in script1, script2:
@@ -30,7 +32,7 @@ class Browser:
         Open url.
         """
         try:
-            print(f'Opening page {url} ...')
+            self.logger.info(f'Opening page {url} ...')
             self._driver.get(url=url)
         
             WebDriverWait(self._driver, 10).until(
@@ -38,11 +40,10 @@ class Browser:
             )
             human_pause(4, 5)
         except TimeoutException:
-            print(f"Timeout while loading {url}")
-        except WebDriverException as e:
-            print(f"WebDriver error while opening {url}: {e}")
+            self.logger.warning("Timeout while loading %s", url)
+        except WebDriverException:
+            self.logger.exception("WebDriver error while opening %s", url)
         
-
 
 
     @property
@@ -53,17 +54,28 @@ class Browser:
         return self._driver
 
 
+    @property
+    def logger(self) -> logging.Logger:
+        """
+        Return instance of logger.
+        """
+        return self._logger
+    
+
+
     def close(self) -> None:
         """
         Terminate driver.
         """
-        print('Closing browser...')
+        self.logger.info('Closing browser...')
         self._driver.quit()
+
 
 
     def __enter__(self):
         """Return self for working with."""
         return self
+
 
 
     def __exit__(self, exc_type, exc_val, exc_tb):

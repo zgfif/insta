@@ -6,7 +6,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 from applib.media_data import MediaData
 from applib.xlsx_file import XlsxFile
-
+from logging import Logger
 
 
 
@@ -14,8 +14,9 @@ class Profile:
     TIMEOUT = 10
 
 
-    def __init__(self, driver: WebDriver, filename: str) -> None:
+    def __init__(self, driver: WebDriver, logger: Logger, filename: str) -> None:
         self._driver = driver
+        self._logger = logger
         self._filename = filename
     
 
@@ -33,13 +34,13 @@ class Profile:
         if not images_links:
             return
 
-        print(f'Start collecting data for {self._filename} ...')
+        self._logger.info(f'Start collecting data for {self._filename} ...')
 
         for i, link in enumerate(images_links):
-            data = MediaData(driver=self._driver, image_link=link, id=i+1).extract()
-            print(f'media: {i}',data)
+            data = MediaData(driver=self._driver, logger=self._logger, image_link=link, id=i+1).extract()
+            self._logger.info(f'media: {i}',data)
 
-            XlsxFile(filepath=self._filename).add_row(data)
+            XlsxFile(logger=self._logger, filepath=self._filename).add_row(data)
     
 
 
@@ -48,12 +49,13 @@ class Profile:
         Return list of media links. If could not found any links return an empty list.
         """
         selector = (By.TAG_NAME, 'a')
+        
         try:
             return WebDriverWait(images_block, self.TIMEOUT).until(
                 EC.presence_of_all_elements_located(selector)
             )
         except TimeoutException:
-            print('Could not found any media links. Return an empty links.')
+            self._logger.warning('Could not found any media links. Return an empty links.')
             return []
 
 
@@ -63,9 +65,10 @@ class Profile:
         Return block which contains medeia. If could not found return None.
         """
         selector = (By.XPATH, '/html/body/div[1]/div/div/div[2]/div/div/div[1]/div[2]/div[1]/section/main/div/div/div[2]/div/div/div/div')
+        
         try:
             return WebDriverWait(self._driver, self.TIMEOUT).until(
                 EC.presence_of_element_located(selector)
             )
         except TimeoutException:
-            print('Could not found images block. Return None.')
+            self._logger.warning('Could not found images block. Return None.')

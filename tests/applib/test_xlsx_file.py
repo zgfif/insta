@@ -1,10 +1,12 @@
 import unittest
 from applib.xlsx_file import XlsxFile
 import os
+from applib.custom_logger import CustomLogger
 
 
 class TestXslxFile(unittest.TestCase):
     def test_add_row_to_unexisting_file(self):
+        logger = CustomLogger(logpath='test2.log').setup()
         column_names = ('id', 'url', 'comments', 'subs',)
 
         filepath = 'pashabratanov.xlsx'
@@ -18,7 +20,7 @@ class TestXslxFile(unittest.TestCase):
             'subs': 'no subs',
         }
 
-        xlsx_file = XlsxFile(filepath=filepath)
+        xlsx_file = XlsxFile(filepath=filepath, logger=logger)
         
         xlsx_file.add_row(data)
         
@@ -37,6 +39,7 @@ class TestXslxFile(unittest.TestCase):
 
 
     def test_add_row_to_existing_file(self):
+        logger = CustomLogger(logpath='test2.log').setup()
         column_names = ('id', 'url', 'comments', 'subs',)
 
         filepath = 'pashabratanov_exist.xlsx'
@@ -50,7 +53,7 @@ class TestXslxFile(unittest.TestCase):
                 'subs': 'no subs',
             }
 
-        xlsx_file = XlsxFile(filepath=filepath)
+        xlsx_file = XlsxFile(logger=logger, filepath=filepath)
         
         xlsx_file.add_row(data)
         

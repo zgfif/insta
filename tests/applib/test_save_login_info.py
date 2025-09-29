@@ -18,11 +18,12 @@ class TestSaveLoginInfo(unittest.TestCase):
         b.open(url=url)
         
         Login(
-            driver=b.driver, 
+            driver=b.driver,
+            logger=b.logger,
             username=os.getenv('IUSERNAME', ''), 
             password=os.getenv('IPASSWORD', ''),
         ).perform()
 
-        SaveLoginInfo(driver=b.driver, save=False).process()
+        SaveLoginInfo(driver=b.driver, logger=b.logger, save=False).process()
 
         b.close()

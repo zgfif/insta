@@ -6,15 +6,16 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium.webdriver.chrome.webdriver import WebDriver
 from applib.human_like_mouse_move import human_like_mouse_move
 from applib.human_pause import human_pause
-
+from logging import Logger
 
 
 class SaveLoginInfo:
     TIMEOUT = 10
 
 
-    def __init__(self, driver: WebDriver, save: bool = False) -> None:
+    def __init__(self, driver: WebDriver, logger: Logger, save: bool = False) -> None:
         self._driver = driver
+        self._logger = logger
         self._save = save
 
     
@@ -32,7 +33,7 @@ class SaveLoginInfo:
         if not not_now_element:
             return
 
-        print('Start Save login info...')
+        self._logger.info('Start Save login info...')
 
         if self._save:
             human_like_mouse_move(driver=self._driver, element=save_info_element)
@@ -51,7 +52,7 @@ class SaveLoginInfo:
                 EC.element_to_be_clickable(selector)
             )
         except TimeoutException:
-            print('Could not found "Save info" element. Return None.')
+            self._logger.warning('Could not found "Save info" element. Return None.')
 
 
     def _not_now_element(self) -> WebElement|None:
@@ -61,4 +62,4 @@ class SaveLoginInfo:
                 EC.element_to_be_clickable(selector)
             )
         except TimeoutException:
-            print('Could not found "Not now" element. Return None.')
+            self._logger.warning('Could not found "Not now" element. Return None.')

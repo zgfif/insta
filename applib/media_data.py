@@ -5,14 +5,17 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.remote.webelement import WebElement
 from applib.human_like_mouse_move import human_like_mouse_move
 from applib.human_pause import human_pause
+from logging import Logger
+from selenium.webdriver.chrome.webdriver import WebDriver
 
 
 
 class MediaData:
     TIMEOUT = 10
 
-    def __init__(self, driver, image_link: WebElement, id: int) -> None:
+    def __init__(self, driver: WebDriver, logger: Logger, image_link: WebElement, id: int) -> None:
         self._driver = driver
+        self._logger = logger
         self._image_link = image_link
         self._id = id
 
@@ -74,7 +77,7 @@ class MediaData:
                 EC.presence_of_all_elements_located(selector)
             )
         except TimeoutException:
-            print('Could not found comments block. Return None.')
+            self._logger.warning('Could not found comments block. Return None.')
             return []
 
 
@@ -90,4 +93,4 @@ class MediaData:
                 EC.visibility_of_element_located(selector)
             )
         except TimeoutException:
-            print('Could not found close image element. Return None.')
+            self._logger.warning('Could not found close image element. Return None.')
